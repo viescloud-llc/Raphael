@@ -20,8 +20,13 @@ public class RaphaelApplication {
 		SpringApplication.run(RaphaelApplication.class, args);
 	}
 
+	@GetMapping()
+	public String healthCheck1() {
+		return String.format("Raphael %s is up and running", env);
+	}
+
 	@GetMapping("/_status/healthz")
-	public String healthCheck() {
+	public String healthCheck2() {
 		return String.format("Raphael %s is up and running", env);
 	}
 

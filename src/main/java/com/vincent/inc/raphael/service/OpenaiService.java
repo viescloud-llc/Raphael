@@ -27,31 +27,29 @@ public class OpenaiService {
         chatList.add(new ChatMessage("system", "A sassy and tired personal assistant"));
     }
 
-    
-
     public List<CompletionChoice> promt(Promt promt) {
 
         CompletionRequest completionRequest = CompletionRequest.builder()
-        .prompt(promt.getMessage())
-        .model("text-davinci-003")
-        .echo(true)
-        .build();
+                .prompt(promt.getMessage())
+                .model("text-davinci-003")
+                .echo(true)
+                .build();
         return ai.createCompletion(completionRequest).getChoices();
     }
 
     public List<ChatCompletionChoice> chat(Promt promt) {
         this.chatList.add(new ChatMessage("user", promt.getMessage()));
         ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest
-        .builder()
-        .model("gpt-3.5-turbo")
-        .temperature(0.8)
-        .messages(this.chatList)
-        .build();
+                .builder()
+                .model("gpt-3.5-turbo")
+                .temperature(0.8)
+                .messages(this.chatList)
+                .build();
 
         var response = ai.createChatCompletion(chatCompletionRequest).getChoices();
 
         this.chatList.add(new ChatMessage("assistant", response.get(0).getMessage().getContent()));
-        
+
         return ai.createChatCompletion(chatCompletionRequest).getChoices();
     }
 }

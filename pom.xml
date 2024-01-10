@@ -131,6 +131,13 @@
 			<version>0.12.0</version>       
 		</dependency>
 
+		<!-- self host dependency -->
+		<dependency>
+			<groupId>com.vincent.inc</groupId>
+			<artifactId>vies-spring-utils</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -169,6 +176,13 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+		</repository>
+
+		<!--custom maven repo-->
+		<repository>
+			<id>reposilite-repository-releases</id>
+			<name>Reposilite Repository</name>
+			<url>https://reposilite.viescloud.com/releases</url>
 		</repository>
 	</repositories>
 </project>

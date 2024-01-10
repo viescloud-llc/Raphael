@@ -1,0 +1,80 @@
+[
+	{
+		"configId": 1,
+		"configName": "java with git hook",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-dev",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Dev",
+			"upperCaseServiceName": "RAPHAEL-DEV",
+			"environment": "dev",
+			"dockerImage": "raphael"
+		}
+	},
+	{
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-dev-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Dev k8s",
+			"triggerAfterJobName": "raphael-dev",
+			"k8sServiceFolderName": "raphael",
+			"environment": "dev"
+		}
+	},
+	{
+		"configId": 3,
+		"configName": "java",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-stage",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Stage",
+			"upperCaseServiceName": "RAPHAEL-STAGE",
+			"environment": "stage",
+			"dockerImage": "raphael"
+		}
+	},
+	{
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-stage-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Stage k8s",
+			"triggerAfterJobName": "raphael-stage",
+			"k8sServiceFolderName": "raphael",
+			"environment": "stage"
+		}
+	},
+	{
+		"configId": 3,
+		"configName": "java",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-prod",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Prod",
+			"upperCaseServiceName": "RAPHAEL-STAGE",
+			"environment": "prod",
+			"dockerImage": "raphael"
+		}
+	},
+	{
+		"configId": 2,
+		"configName": "k8s",
+		"path": "/vincent-services/v-eco",
+		"jobName": "raphael-prod-k8s",
+		"replaceMap": {
+			"projectUrl": "https://github.com/vincent-inc/Raphael",
+			"displayName": "raphael Prod k8s",
+			"triggerAfterJobName": "raphael-prod",
+			"k8sServiceFolderName": "raphael",
+			"environment": "prod"
+		}
+	}
+]

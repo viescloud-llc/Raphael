@@ -37,7 +37,7 @@ public class TTSService extends ViesService<TTS, Integer, TTSDao> {
         sanitizingText(object);
         var foundedTTS = this.getByText(object.getText());
         if(!ObjectUtils.isEmpty(foundedTTS))
-            return foundedTTS;
+            return this.getById(foundedTTS.getId());
 
         object.setWav(this.generateTTS(object.getText()));
         object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));
@@ -49,7 +49,7 @@ public class TTSService extends ViesService<TTS, Integer, TTSDao> {
         sanitizingText(object);
         var foundedTTS = this.getByText(object.getText());
         if(!ObjectUtils.isEmpty(foundedTTS))
-            return foundedTTS;
+            return this.getById(foundedTTS.getId());
 
         object.setWav(this.generateTTS(object.getText()));
         object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));
@@ -61,7 +61,7 @@ public class TTSService extends ViesService<TTS, Integer, TTSDao> {
         sanitizingText(object);
         var foundedTTS = this.getByText(object.getText());
         if(!ObjectUtils.isEmpty(foundedTTS))
-            return foundedTTS;
+            return this.getById(foundedTTS.getId());
 
         object.setWav(this.generateTTS(object.getText()));
         object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));

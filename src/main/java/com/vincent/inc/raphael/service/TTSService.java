@@ -8,82 +8,64 @@ import javax.sql.rowset.serial.SerialException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import com.vincent.inc.raphael.dao.TTSDao;
 import com.vincent.inc.raphael.feign.AiReaderFeignClient;
+import com.vincent.inc.raphael.feign.SmbFileManagerClient;
 import com.vincent.inc.raphael.model.AiReaderRequest;
-import com.vincent.inc.raphael.model.TTS;
-import com.vincent.inc.raphael.model.TimeModel;
-import com.vincent.inc.viesspringutils.service.ViesService;
-import com.vincent.inc.viesspringutils.util.DatabaseUtils;
-import com.vincent.inc.viesspringutils.util.DateTime;
+import com.vincent.inc.raphael.model.SmbFileManager.FileMetaData;
+import com.vincent.inc.raphael.util.TTSServices;
+import com.vincent.inc.viesspringutils.model.CustomMultipartFile;
+
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
-public class TTSService extends ViesService<TTS, Integer, TTSDao> {
+@Slf4j
+public class TTSService {
+
+    private static final String SERVICE_USER_ID = "-1";
 
     @Autowired
     private AiReaderFeignClient aiReaderFeignClient;
 
-    public TTSService(DatabaseUtils<TTS, Integer> databaseUtils, TTSDao repositoryDao) {
-        super(databaseUtils, repositoryDao);
-    }
+    @Autowired
+    private SmbFileManagerClient smbFileManagerClient;
 
-    @Override
-    protected TTS newEmptyObject() {
-        return new TTS();
-    }
-    
-    @Override
-    public TTS create(TTS object) {
-        sanitizingText(object);
-        var foundedTTS = this.getByText(object.getText());
-        if(!ObjectUtils.isEmpty(foundedTTS))
-            return this.getById(foundedTTS.getId());
-
-        object.setWav(this.generateTTS(object.getText()));
-        object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));
-        return super.create(object);
-    }
-
-    @Override
-    public TTS modify(Integer id, TTS object) {
-        sanitizingText(object);
-        var foundedTTS = this.getByText(object.getText());
-        if(!ObjectUtils.isEmpty(foundedTTS))
-            return this.getById(foundedTTS.getId());
-
-        object.setWav(this.generateTTS(object.getText()));
-        object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));
-        return super.modify(id, object);
-    }
-
-    @Override
-    public TTS patch(Integer id, TTS object) {
-        sanitizingText(object);
-        var foundedTTS = this.getByText(object.getText());
-        if(!ObjectUtils.isEmpty(foundedTTS))
-            return this.getById(foundedTTS.getId());
-
-        object.setWav(this.generateTTS(object.getText()));
-        object.setCreatedTime(TimeModel.fromDateTime(DateTime.now()));
-        return super.patch(id, object);
-    }
-
-    public TTS getByText(String text) {
-        var list = this.repositoryDao.findAllByText(text);
-        for(var tts: list) {
-            if(tts.getText().equalsIgnoreCase(text))
-                return tts;
+    public byte[] generateWav(String text) {
+        text = TTSServices.preProcessingText(text);
+        byte[] wav = null;
+        try {
+            wav = smbFileManagerClient.getFileByFileName(SERVICE_USER_ID, text + ".wav");
         }
-        return null;
+        catch(FeignException ex) {
+            log.info("no file with name {} is found", text);
+            if(ex.status() == 404) {
+                try {
+                    this.preload(text);
+                } catch (SerialException e) {
+                    log.error(e.getMessage(), e);
+                }
+                return generateWav(text);
+            }
+        }
+        
+        return wav;
     }
 
-    public TTS sanitizingText(TTS tts) {
-        tts.setText(sanitizingText(tts.getText()));
-        return tts;
-    }
-
-    public String sanitizingText(String text) {
-        return text.toLowerCase().trim().replaceAll(" +", " ");
+    public void preload(String text) throws SerialException {
+        text = TTSServices.preProcessingText(text);
+        FileMetaData fileMetaData = null;
+        try {
+            fileMetaData = smbFileManagerClient.getMetadata(SERVICE_USER_ID, text + ".wav");
+        }
+        catch(FeignException ex) {
+            log.info("no file with name {} is found", text);
+        }
+        
+        if(ObjectUtils.isEmpty(fileMetaData)) {
+            var tts = generateTTS(text);
+            var multipart = CustomMultipartFile.builder().customName("file").customOriginalFileName(text + ".wav").customContentType("audio/wav").input(TTSServices.getBlobAsBytes(tts)).build();
+            this.smbFileManagerClient.uploadFile(SERVICE_USER_ID, multipart, false);
+        }
     }
 
     public SerialBlob generateTTS(String text) {
@@ -100,4 +82,6 @@ public class TTSService extends ViesService<TTS, Integer, TTSDao> {
 
         return null;
     }
+
+    
 }

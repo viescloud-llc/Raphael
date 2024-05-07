@@ -1,49 +1,50 @@
 package com.vincent.inc.raphael.controller;
 
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.sql.rowset.serial.SerialException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vincent.inc.raphael.model.TTS;
+import com.vincent.inc.raphael.model.Text;
 import com.vincent.inc.raphael.service.TTSService;
-import com.vincent.inc.viesspringutils.controller.ViesController;
-import com.vincent.inc.viesspringutils.exception.HttpResponseThrowers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
-@RequestMapping("/tts")
-public class TTSController extends ViesController<TTS, Integer, TTSService> {
+@RequestMapping("/api/v2/tts")
+@Slf4j
+public class TTSController {
 
-    public TTSController(TTSService service) {
-        super(service);
+    @Autowired
+    private TTSService ttsService;
+
+    private final ExecutorService threadPool = Executors.newCachedThreadPool();
+
+    @PostMapping("wav")
+    public ResponseEntity<byte[]> generateWav(@RequestBody Text text) throws SQLException {
+        var wav = this.ttsService.generateWav(text.getText());
+        return ResponseEntity.ok().header("Content-Type", "audio/wav").body(wav);
     }
-    
-    @GetMapping("wav/{id}")
-    public ResponseEntity<byte[]> getBlobById(@PathVariable int id) throws SQLException {
-        var tts = this.service.getById(id);
-        var wav = tts.getWav();
-        int blobLength = (int) wav.length();  
-        byte[] blobAsBytes = wav.getBytes(1, blobLength);
-        return ResponseEntity.ok().header("Content-Type", "audio/wav").body(blobAsBytes);
-    }
 
-    @GetMapping("wav")
-    public ResponseEntity<byte[]> getBlobByText(@RequestParam String text) throws SQLException {
-        text = this.service.sanitizingText(text);
-        var tts = this.service.getByText(text);
-
-        if(ObjectUtils.isEmpty(tts))
-            HttpResponseThrowers.throwBadRequest("TTS does not exist");
-
-        var wav = tts.getWav();
-        int blobLength = (int) wav.length();  
-        byte[] blobAsBytes = wav.getBytes(1, blobLength);
-        return ResponseEntity.ok().header("Content-Type", "audio/wav").body(blobAsBytes);
+    @PutMapping("preload")
+    public ResponseEntity<?> preloadWav(@RequestBody Text text) throws SQLException {
+        var input = text.getText();
+        this.threadPool.execute(() -> {
+            try {
+                this.ttsService.preload(input);
+            } catch (SerialException e) {
+                log.error(e.getMessage(), e);
+            }
+        });
+        return ResponseEntity.ok().build();
     }
 }

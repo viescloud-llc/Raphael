@@ -13,7 +13,6 @@ import com.vincent.inc.raphael.feign.AiReaderFeignClient;
 import com.vincent.inc.raphael.model.AiReaderRequest;
 import com.vincent.inc.raphael.model.TTS;
 import com.vincent.inc.raphael.model.TimeModel;
-import com.vincent.inc.raphael.util.TTSServices;
 import com.vincent.inc.viesspringutils.service.ViesService;
 import com.vincent.inc.viesspringutils.util.DatabaseCall;
 import com.vincent.inc.viesspringutils.util.DateTime;
@@ -84,7 +83,7 @@ public class TTSServiceV1 extends ViesService<TTS, Integer, TTSDao> {
     }
 
     public String sanitizingText(String text) {
-        return TTSServices.preProcessingText(text);
+        return text.toLowerCase().trim().replaceAll(" +", " ");
     }
 
     public SerialBlob generateTTS(String text) {

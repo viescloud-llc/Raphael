@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.vincent.inc.raphael.model.TTS;
 
-public interface TTSDao extends JpaRepository<TTS, Integer> {
+public interface TTSDao extends JpaRepository<TTS, Long> {
     public TTS findByText(String text);
 	public List<TTS> findAllByText(String text);
 }

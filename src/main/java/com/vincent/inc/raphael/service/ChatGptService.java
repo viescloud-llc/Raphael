@@ -3,6 +3,7 @@ package com.vincent.inc.raphael.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +13,21 @@ import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
+import com.vincent.inc.raphael.config.ApplicationProperties;
 import com.vincent.inc.raphael.model.Promt;
 
 @Service
-public class OpenaiService {
+public class ChatGptService {
 
-    OpenAiService ai;
+    private OpenAiService ai;
 
-    List<ChatMessage> chatList;
+    private List<ChatMessage> chatList;
 
-    public OpenaiService(@Value("${openai.token}") String token) {
-        ai = new OpenAiService(token);
+    private ApplicationProperties applicationProperties;
+
+    public ChatGptService(ApplicationProperties applicationProperties) {
+        this.applicationProperties = applicationProperties;
+        ai = new OpenAiService(applicationProperties.getOpenAPI_token());
         this.chatList = new ArrayList<>();
         chatList.add(new ChatMessage("system", "A sassy and tired personal assistant"));
     }

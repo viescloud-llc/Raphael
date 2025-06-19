@@ -2,25 +2,22 @@ package com.vincent.inc.raphael;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vincent.inc.viesspringutils.ViesApplication;
+import com.viescloud.eco.viesspringutils.auto.config.ViesBeanConfig;
 
 
 @SpringBootApplication
-@EnableDiscoveryClient
 @RestController
-@EnableFeignClients
-public class RaphaelApplication extends ViesApplication {
+@Import(ViesBeanConfig.class)
+@EnableJpaRepositories
+@EntityScan
+public class RaphaelApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(RaphaelApplication.class, args);
-	}
-
-	@Override
-	public String getApplicationName() {
-		return "Raphael";
 	}
 }

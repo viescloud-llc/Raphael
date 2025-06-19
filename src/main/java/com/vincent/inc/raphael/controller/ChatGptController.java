@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.theokanning.openai.completion.CompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.vincent.inc.raphael.model.Promt;
-import com.vincent.inc.raphael.service.OpenaiService;
+import com.vincent.inc.raphael.service.ChatGptService;
 
 @RestController
-@RequestMapping("openais")
-public class OpenaiController {
+@RequestMapping("api/v1/chatgpts")
+public class ChatGptController {
 
     @Autowired
-    private OpenaiService openaiService;
+    private ChatGptService openaiService;
     
     @PostMapping("promt")
     public List<CompletionChoice> promt(@RequestBody Promt promt) {

@@ -1,36 +1,28 @@
 package com.vincent.inc.raphael.model;
 
-import java.util.List;
+import java.io.Serializable;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "response")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Response {
+@Embeddable
+public class Response implements Serializable {
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
+    private String responseText;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
-    @Column(length = 3000)
-    private List<String> response;
-
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String context;
     
-    @Column
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String emotion;
 }

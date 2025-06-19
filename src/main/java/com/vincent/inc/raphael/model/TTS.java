@@ -1,33 +1,29 @@
 package com.vincent.inc.raphael.model;
 
-import java.io.Serializable;
-
 import javax.sql.rowset.serial.SerialBlob;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.viescloud.eco.viesspringutils.model.TrackedTimeStamp;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tts")
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class TTS implements Serializable {
+public class TTS extends TrackedTimeStamp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     
     @Column(columnDefinition = "BLOB")
     private String text;
@@ -35,7 +31,4 @@ public class TTS implements Serializable {
     @Column(columnDefinition = "LONGBLOB")
     @JsonIgnore
     private SerialBlob wav;
-    
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private TimeModel createdTime;
 }

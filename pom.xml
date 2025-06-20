@@ -111,17 +111,17 @@
 		</dependency>
 
 		<!-- OpenAI -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.theokanning.openai-gpt3-java</groupId>
 			<artifactId>service</artifactId>
 			<version>0.18.2</version>       
-		</dependency>
+		</dependency> -->
 
 		<!-- self host dependency -->
 		<dependency>
 			<groupId>com.viescloud.eco</groupId>
 			<artifactId>vies-spring-utils</artifactId>
-			<version>5.7.0</version>
+			<version>5.7.4</version>
 		</dependency>
 	</dependencies>
 

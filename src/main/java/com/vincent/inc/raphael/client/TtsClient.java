@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.viescloud.eco.viesspringutils.util.WebCall;
 import com.vincent.inc.raphael.config.ApplicationProperties;
+import com.vincent.inc.raphael.model.TTS;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,9 +38,16 @@ public class TtsClient {
 
         return WebCall.of(restTemplate, byte[].class)
                       .request(HttpMethod.GET, String.format("%s/generate/wav", applicationProperties.getCoquiTTS_Url()))
-                      .queryParams(params)
+                      .queryParam("text", text)
+                      .queryParam("clone_voice", ttsConfig.cloneVoice())
+                      .queryParam("model_name", ttsConfig.modelName())
+                      .logRequest(true)
                       .exchange()
                       .getOptionalResponseBody();
+    }
+
+    public Optional<byte[]> generateWav(TTS tts) {
+        return generateWav(tts.getText(), new TTSConfig(tts.getCloneVoice(), tts.getModelName()));
     }
 
     public Optional<byte[]> generateWav(String text) {
@@ -59,7 +67,7 @@ public class TtsClient {
                       .voices();
     }
 
-    public record TTSModelData(List<String> available_models, List<String> loaded_models, String default_model, int total_available, int total_loaded) {}
+    public record TTSModelData(List<String> available_models, List<String> loaded_models, String default_model, String default_multilingual_model, int total_available, int total_loaded) {}
     public record TTSModelResponse(boolean success, String message, TTSModelData data) {}
 
     public TTSModelData getModels() {

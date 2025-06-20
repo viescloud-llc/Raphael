@@ -4,21 +4,22 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.viescloud.eco.viesspringutils.auto.model.object_storage.DirectAccessLinkType;
 import com.viescloud.eco.viesspringutils.auto.model.object_storage.ObjectStorageData;
 import com.viescloud.eco.viesspringutils.auto.service.object_storage.ObjectStorageService;
+import com.viescloud.eco.viesspringutils.exception.HttpResponseThrowers;
 import com.vincent.inc.raphael.model.TTS;
 import com.vincent.inc.raphael.service.TTSService;
+import com.vincent.inc.raphael.util.TTSTextNormalizer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,23 +46,14 @@ public class TTSController {
         return this.ttsService.getVoices();
     }
 
-    @GetMapping("wav")
-    public ResponseEntity<byte[]> generateWav(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
-        return generateWav(new TTS(text, voice, model));
-    }
+    @PutMapping("wav")
+    public ResponseEntity<?> generateWav(@RequestBody TTS tts) {
+        if(ObjectUtils.isEmpty(tts.getText())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
+        }
 
-    @GetMapping("wav/metadata")
-    public ResponseEntity<ObjectStorageData> generateWavMetadata(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
-        return generateWavMetadata(new TTS(text, voice, model));
-    }
+        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
 
-    @GetMapping("wav/preload")
-    public ResponseEntity<?> preload(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
-        return preloadWav(new TTS(text, voice, model));
-    }
-
-    @PostMapping("wav")
-    public ResponseEntity<byte[]> generateWav(@RequestBody TTS tts) {
         var metadata = this.ttsService.generateWav(tts);
         if(metadata.getData() == null) {
             metadata = this.objectStorageService.loadFileData(metadata);
@@ -69,8 +61,14 @@ public class TTSController {
         return ResponseEntity.status(HttpStatus.OK).header("Content-Type", "audio/wav").body(metadata.getData());
     }
 
-    @PostMapping("wav/metadata")
-    public ResponseEntity<ObjectStorageData> generateWavMetadata(@RequestBody TTS tts) {
+    @PutMapping("wav/metadata")
+    public ResponseEntity<?> generateWavMetadata(@RequestBody TTS tts) {
+        if(ObjectUtils.isEmpty(tts.getText())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
+        }
+
+        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
+
         var metadata = this.ttsService.generateWav(tts);
         metadata = this.objectStorageService.addTemporaryAccessLink(metadata, DirectAccessLinkType.GET, Duration.ofMinutes(30));
         return ResponseEntity.ok(metadata);
@@ -78,6 +76,12 @@ public class TTSController {
 
     @PutMapping("wav/preload")
     public ResponseEntity<?> preloadWav(@RequestBody TTS tts) {
+        if(ObjectUtils.isEmpty(tts.getText())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
+        }
+
+        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
+
         this.ttsService.preloadWav(tts);        
         return ResponseEntity.ok(Map.of("status", "ok"));
     }

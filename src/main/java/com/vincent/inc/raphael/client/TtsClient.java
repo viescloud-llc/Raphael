@@ -37,10 +37,8 @@ public class TtsClient {
         }
 
         return WebCall.of(restTemplate, byte[].class)
-                      .request(HttpMethod.GET, String.format("%s/generate/wav", applicationProperties.getCoquiTTS_Url()))
-                      .queryParam("text", text)
-                      .queryParam("clone_voice", ttsConfig.cloneVoice())
-                      .queryParam("model_name", ttsConfig.modelName())
+                      .request(HttpMethod.POST, String.format("%s/generate/wav", applicationProperties.getCoquiTTS_Url()))
+                      .body(params)
                       .exchange()
                       .getOptionalResponseBody();
     }

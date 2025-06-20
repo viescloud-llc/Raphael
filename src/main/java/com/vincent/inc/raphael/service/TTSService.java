@@ -12,6 +12,7 @@ import org.springframework.util.ObjectUtils;
 import com.viescloud.eco.viesspringutils.auto.model.object_storage.ObjectStorageData;
 import com.viescloud.eco.viesspringutils.auto.service.object_storage.ObjectStorageService;
 import com.viescloud.eco.viesspringutils.exception.HttpResponseThrowers;
+import com.viescloud.eco.viesspringutils.model.EncodingType;
 import com.viescloud.eco.viesspringutils.util.DataTransformationUtils;
 import com.viescloud.eco.viesspringutils.util.DateTime;
 import com.viescloud.eco.viesspringutils.util.ScheduledQueueTask;
@@ -141,7 +142,7 @@ public class TTSService {
     }
 
     public static String generateKey(TTS tts) {
-        var key = DataTransformationUtils.base64Encode(tts.toString());
+        var key = DataTransformationUtils.encode(tts.toString(), EncodingType.SHA256);
         return PREFIX + "/" + key + ".wav";
     }
 

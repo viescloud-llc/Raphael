@@ -19,6 +19,7 @@ import com.vincent.inc.raphael.client.TtsClient;
 import com.vincent.inc.raphael.model.TTS;
 
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +34,9 @@ public class TTSService {
     private final TtsClient ttsClient;
     private final ObjectStorageService<ObjectStorageData, ?> objectStorageService;
 
+    @Getter
     private Set<String> voices = new HashSet<>();
+    @Getter
     private Set<String> models = new HashSet<>();
     private String defaultModel = null;
     private String defaultMultilingualModel = null;
@@ -125,12 +128,12 @@ public class TTSService {
             HttpResponseThrowers.throwBadRequest("Text is empty");
         }
 
-        if(ObjectUtils.isEmpty(tts.getModelName())) {
-            if(ObjectUtils.isEmpty(tts.getCloneVoice())) {
-                tts.setModelName(defaultModel);
+        if(ObjectUtils.isEmpty(tts.getModel())) {
+            if(ObjectUtils.isEmpty(tts.getVoice())) {
+                tts.setModel(defaultModel);
             }
             else {
-                tts.setModelName(defaultMultilingualModel);
+                tts.setModel(defaultMultilingualModel);
             }
         }
 

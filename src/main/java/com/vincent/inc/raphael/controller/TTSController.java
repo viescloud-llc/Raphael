@@ -2,6 +2,7 @@ package com.vincent.inc.raphael.controller;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.viescloud.eco.viesspringutils.auto.model.object_storage.DirectAccessLinkType;
@@ -19,6 +21,8 @@ import com.vincent.inc.raphael.model.TTS;
 import com.vincent.inc.raphael.service.TTSService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 @RestController
 @RequestMapping("/api/v1/tts")
@@ -30,6 +34,31 @@ public class TTSController {
 
     @Autowired
     private ObjectStorageService<ObjectStorageData, ?> objectStorageService;
+
+    @GetMapping("models")
+    public Set<String> getModels() {
+        return this.ttsService.getModels();
+    }
+    
+    @GetMapping("voices")
+    public Set<String> getVoices() {
+        return this.ttsService.getVoices();
+    }
+
+    @GetMapping("wav")
+    public ResponseEntity<byte[]> generateWav(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
+        return generateWav(new TTS(text, voice, model));
+    }
+
+    @GetMapping("wav/metadata")
+    public ResponseEntity<ObjectStorageData> generateWavMetadata(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
+        return generateWavMetadata(new TTS(text, voice, model));
+    }
+
+    @GetMapping("wav/preload")
+    public ResponseEntity<?> preload(@RequestParam String text, @RequestParam String voice, @RequestParam String model) {
+        return preloadWav(new TTS(text, voice, model));
+    }
 
     @PostMapping("wav")
     public ResponseEntity<byte[]> generateWav(@RequestBody TTS tts) {
@@ -47,7 +76,7 @@ public class TTSController {
         return ResponseEntity.ok(metadata);
     }
 
-    @PutMapping("preload")
+    @PutMapping("wav/preload")
     public ResponseEntity<?> preloadWav(@RequestBody TTS tts) {
         this.ttsService.preloadWav(tts);        
         return ResponseEntity.ok(Map.of("status", "ok"));

@@ -41,13 +41,12 @@ public class TtsClient {
                       .queryParam("text", text)
                       .queryParam("clone_voice", ttsConfig.cloneVoice())
                       .queryParam("model_name", ttsConfig.modelName())
-                      .logRequest(true)
                       .exchange()
                       .getOptionalResponseBody();
     }
 
     public Optional<byte[]> generateWav(TTS tts) {
-        return generateWav(tts.getText(), new TTSConfig(tts.getCloneVoice(), tts.getModelName()));
+        return generateWav(tts.getText(), new TTSConfig(tts.getVoice(), tts.getModel()));
     }
 
     public Optional<byte[]> generateWav(String text) {

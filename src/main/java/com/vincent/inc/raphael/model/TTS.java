@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TTS {
     private String text;
-    private String cloneVoice;
-    private String modelName;
+    private String voice;
+    private String model;
 }

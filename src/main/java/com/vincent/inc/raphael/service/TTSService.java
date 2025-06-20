@@ -96,6 +96,7 @@ public class TTSService {
         tts = this.formatTTS(tts);
         var key = generateKey(tts);
         var queue = queues.get(count);
+        count = count % QUEUE_MAX_SIZE;
         count++;
 
         queue.add(key, Duration.ofSeconds(2), tts, (t, k) -> {

@@ -51,7 +51,7 @@ public class TTSController {
         if(ObjectUtils.isEmpty(tts.getText())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
         }
-
+        
         tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
 
         var metadata = this.ttsService.generateWav(tts);

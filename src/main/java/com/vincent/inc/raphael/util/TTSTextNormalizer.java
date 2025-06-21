@@ -1,5 +1,7 @@
 package com.vincent.inc.raphael.util;
 
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -258,7 +260,7 @@ public class TTSTextNormalizer {
     }
     
     public static String normalizeForTTS(String text) {
-        String normalized = text;
+        String normalized = Normalizer.normalize(text, Form.NFKC);
         
         // 1. Handle contractions first (before other punctuation removal)
         normalized = normalizeContractions(normalized);

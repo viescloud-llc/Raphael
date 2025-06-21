@@ -11,5 +11,4 @@ public class TTS {
     private String text;
     private String voice;
     private String model;
-    private boolean normalizeText = false;
 }

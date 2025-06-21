@@ -46,6 +46,13 @@ public class TTSController {
         return this.ttsService.getVoices();
     }
 
+    private record DefaultSetting(String defaultModel, String defaultMultilingualModel) {}
+
+    @GetMapping("default")
+    public DefaultSetting getDefaultSetting() {
+        return new DefaultSetting(this.ttsService.getDefaultModel(), this.ttsService.getDefaultMultilingualModel());
+    }
+
     @PutMapping("wav")
     public ResponseEntity<?> generateWav(@RequestBody TTS tts) {
         if(ObjectUtils.isEmpty(tts.getText())) {

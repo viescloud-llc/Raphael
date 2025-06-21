@@ -39,7 +39,9 @@ public class TTSService {
     private Set<String> voices = new HashSet<>();
     @Getter
     private Set<String> models = new HashSet<>();
+    @Getter
     private String defaultModel = null;
+    @Getter
     private String defaultMultilingualModel = null;
     private List<ScheduledQueueTask<TTS>> queues = new ArrayList<>();
     private int count = 0;
@@ -93,11 +95,10 @@ public class TTSService {
     }
 
     public void preloadWav(TTS tts) {
+        var index = (++count) % QUEUE_MAX_SIZE;
         tts = this.formatTTS(tts);
         var key = generateKey(tts);
-        var queue = queues.get(count);
-        count = count % QUEUE_MAX_SIZE;
-        count++;
+        var queue = queues.get(index);
 
         queue.add(key, Duration.ofSeconds(2), tts, (t, k) -> {
             if(!this.objectStorageService.isFileExists(k)) {

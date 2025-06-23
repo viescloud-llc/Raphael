@@ -1,5 +1,7 @@
 package com.vincent.inc.raphael.controller;
 
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +21,6 @@ import com.viescloud.eco.viesspringutils.auto.service.object_storage.ObjectStora
 import com.viescloud.eco.viesspringutils.exception.HttpResponseThrowers;
 import com.vincent.inc.raphael.model.TTS;
 import com.vincent.inc.raphael.service.TTSService;
-import com.vincent.inc.raphael.util.TTSTextNormalizer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +60,7 @@ public class TTSController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
         }
         
-        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
+        tts.setText(Normalizer.normalize(tts.getText(), Form.NFKC));
 
         var metadata = this.ttsService.generateWav(tts);
         if(metadata.getData() == null) {
@@ -74,7 +75,7 @@ public class TTSController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
         }
 
-        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
+        tts.setText(Normalizer.normalize(tts.getText(), Form.NFKC));
 
         var metadata = this.ttsService.generateWav(tts);
         metadata = this.objectStorageService.addTemporaryAccessLink(metadata, DirectAccessLinkType.GET, Duration.ofMinutes(30));
@@ -87,7 +88,7 @@ public class TTSController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(HttpResponseThrowers.getExceptionResponse(HttpStatus.BAD_REQUEST, "Text is empty"));
         }
 
-        tts.setText(TTSTextNormalizer.normalizeForTTS(tts.getText()));
+        tts.setText(Normalizer.normalize(tts.getText(), Form.NFKC));
 
         this.ttsService.preloadWav(tts);        
         return ResponseEntity.ok(Map.of("status", "ok"));
